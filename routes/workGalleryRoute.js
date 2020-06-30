@@ -44,7 +44,7 @@ router.delete("/:galleryId",authorization,hasShop,async(req,res)=>{
        res.status(500).send({message:"Error delteting workgallery"+e});
     }
 });
-router.delete("admin/:galleryId",authorization,hasShop,async(req,res)=>{
+router.delete("/admin/:galleryId",authorization,hasShop,async(req,res)=>{
     try{
         const gallery= await WorkGallery.findById(req.params.galleryId);
        await WorkGallery.findOneAndRemove({_id:req.params.galleryId});
