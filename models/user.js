@@ -13,6 +13,11 @@ const UserSchema=mongoose.Schema({
         type:Date,
         default:Date.now,
     },
+    isAdmin:{
+        default:false,
+        type:Boolean
+
+    },
     email_verified:{
         type:Boolean,
         default:false,

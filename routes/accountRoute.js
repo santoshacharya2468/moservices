@@ -42,14 +42,16 @@ router.post("/login", async (req, res) => {
               { email: user.email, id: user._id },
               "53465FDSFf##%#%$%",
               {
-                expiresIn: "30 days",
+                expiresIn: "60 days",
               }
             );
-            var isAdmin=user.isAdmin||false;
+            console.log(user);
+            var isAdmin=user.isAdmin ||false;
+
            
             res.json({ token: token, id: user._id,isAdmin:isAdmin});
           } catch (e) {
-            res.status(500).send({ message: "Error signin...." });
+            res.status(500).send({ message: "Error signin...."});
           }
         } else {
           res.status(401).send({ message: "Email/password error...." });
