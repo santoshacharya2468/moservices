@@ -62,22 +62,24 @@ router.get("/", authorization, hasShop, async (req, res) => {
     }
 
 });
+const Visit=require("../models/view");
 router.get("/all", authorization,  async (req, res) => {
     try {
         // var clicks = await Click.find({ shop: req.shop });
         // res.send(clicks);
-        var result=await Click.find().sort({clickDate:-1});
+        var result=await Visit.find().sort({visitDate:-1});
        // res.send(result);
         if(result.length>0){
             var data=[];
-            var startDate=result[0].clickDate;
+            var startDate=result[0].visitDate;
+            
             var count=0;
             var index=0;
             var datalength=result.length;
         for(var i=0;i<datalength;i++){
-           var nday= result[i].clickDate;
+           var nday= result[i].visitDate;
             index+=1;
-            if(startDate.getDay()!=result[i].clickDate.getDay()){
+            if(startDate.getDay()!=result[i].visitDate.getDay()){
                 data.push({date:startDate,count:count});
                 count=1;
                 startDate=nday;
