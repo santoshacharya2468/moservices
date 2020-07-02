@@ -45,10 +45,8 @@ router.post("/login", async (req, res) => {
                 expiresIn: "30 days",
               }
             );
-            var isAdmin=false;
-            if(email=="s@gmail.com"){
-              isAdmin=true;
-            }
+            var isAdmin=user.isAdmin||false;
+           
             res.json({ token: token, id: user._id,isAdmin:isAdmin});
           } catch (e) {
             res.status(500).send({ message: "Error signin...." });
