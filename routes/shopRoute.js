@@ -132,7 +132,7 @@ router.post("/", upload.single("logo"), async (req, res) => {
           let result = await user.save();
           //from here start with shop registeration
           req.body.owner = result;
-          req.body.activated = false;
+          req.body.activated = true;
           req.body.businessLogo = req.logo;
           req.body.packageDuration = {
             duration: req.body.duration,
@@ -144,6 +144,10 @@ router.post("/", upload.single("logo"), async (req, res) => {
             let result = await shop.save();
             res.status(201).send(result);
           } catch (e) {
+            try{
+              await User.findOneAndDelete({email:email});
+            }
+            catch(e){}
             console.log(req.logo);
             fs.unlinkSync(appDir + req.logo);
             res.status(400).send(e);

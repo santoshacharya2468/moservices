@@ -45,18 +45,22 @@ router.post("/login", async (req, res) => {
                 expiresIn: "30 days",
               }
             );
-            res.json({ token: token, id: user._id });
+            var isAdmin=false;
+            if(email=="s@gmail.com"){
+              isAdmin=true;
+            }
+            res.json({ token: token, id: user._id,isAdmin:isAdmin});
           } catch (e) {
-            res.status(500).send({ message: "error signin...." });
+            res.status(500).send({ message: "Error signin...." });
           }
         } else {
-          res.status(401).send({ message: "email/password error...." });
+          res.status(401).send({ message: "Email/password error...." });
         }
       } catch (e) {
-        res.status(401).send({ message: "email/password error...." });
+        res.status(401).send({ message: "Email/password error...." });
       }
     } else {
-      res.status(401).send({ message: "email/password error...." });
+      res.status(401).send({ message: "Email/password error...." });
     }
   } catch (e) {
     res.status(500).send({ message: "Server error try again..." });
