@@ -25,9 +25,9 @@ router.get("/", async (req, res) => {
   let page = req.query.page || 1;
   try {
     var shops = await Shop.find({activated:true})
-      .select("banner activated category")
       .skip((page - 1) * perPage)
       .limit(perPage)
+      .populate("category")
       .sort({ registeredAt: -1 });
 
     if ((await Shop.find({activated:true}).count()) > perPage * page) {
@@ -44,11 +44,10 @@ router.get("/:catId", async (req, res) => {
     let page = req.query.page || 1;
     try {
       var shops = await Shop.find({activated:true,category:req.params.catId})
-        .select("banner activated category")
         .skip((page - 1) * perPage)
+        .populate("category")
         .limit(perPage)
         .sort({ updatedDate: -1 });
-  
       if ((await Shop.find({activated:true,category:req.params.catId}).count()) > perPage * page) {
         var nextPage = Number(page) + 1;
       } else {
