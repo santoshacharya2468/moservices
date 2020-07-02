@@ -7,8 +7,8 @@ const Shop = require("./models/shop");
 const appMiddleware = require("./middlewares/appmiddleware");
 //models
 const User = require("./models/user");
-const dotenv = require("dotenv");
-dotenv.config();
+// const dotenv = require("dotenv");
+// dotenv.config();
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
 
@@ -37,6 +37,7 @@ const adminShopRoute=require("./routes/adminShopRoute");
 const adminCategoryRoute=require("./routes/adminCategoryRoute");
 const admin=require("./routes/adminDashBoard");
 const authorization = require("./middlewares/authorization");
+const bannerRoute=require("./routes/bannerRoute");
 app.use("/account", appMiddleware, accountRoute);
 app.use("/shop", appMiddleware, shopRoute);
 app.use("/category", appMiddleware, categoryRoute);
@@ -44,10 +45,12 @@ app.use("/deal", appMiddleware, dealRoute);
 app.use("/gallery", appMiddleware, galleryRoute);
 app.use("/click", appMiddleware, clickRoute);
 app.use("/like", appMiddleware, likeRoute);
+app.use("/banner",bannerRoute);
 //admin route
 app.use("/admin-shop",adminShopRoute);
 app.use("/admin-category",adminCategoryRoute);
 app.use("/admin",authorization,admin);
+
 
 //search route
 app.get("/search/:query", async (req, res) => {
@@ -56,6 +59,20 @@ app.get("/search/:query", async (req, res) => {
     var shops = await Shop.find({
       businessName: { $regex: req.params.query, $options: "i" },
       activated:true,
+    })
+      .populate("category")
+      .limit(20);
+    res.json(shops);
+  } catch (e) {
+    res.status(500).send({ message: "server error" + e.message });
+  }
+});
+app.get("/admin-search/:query", async (req, res) => {
+  //this route should be paginated
+  try {
+    var shops = await Shop.find({
+      businessName: { $regex: req.params.query, $options: "i" },
+    
     })
       .populate("category")
       .limit(20);

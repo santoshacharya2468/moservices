@@ -74,33 +74,22 @@ const shopSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "Category",
   },
-  subCategories: [
-    {
-      type: String,
-    },
-  ],
   shopDescription: {
     type: String,
   },
-
-  discountPercent: {
-    type: Number,
-  },
-
-  profilePicture: {
-    type: String,
-  },
-  profileVideo: {
-    type: String,
-  },
+ 
   banner: {
+  
     showDiscount: { type: Boolean, default: false },
     colorIndex: { type: Number, default: 0 },
-    selectProfile: { type: Boolean, default: false },
+    isDefault :{ type: Boolean, default: true },
+    profilePicture: {type: String,},
+    profileVideo: {type: String,},
+    discountPercent: {
+      type: Number,
+    },
   },
-  updatedDate: {
-    type: Date,
-    default: Date.now,
-  },
+  updatedDate: {type: Date,default: Date.now,},
+
 });
 module.exports = mongoose.model("Shop", shopSchema);
