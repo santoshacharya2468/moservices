@@ -44,7 +44,7 @@ router.get("/", async (req, res) => {
   let page = req.query.page || 1;
   //this route should be paginated
   try {
-    var shops = await Shop.find({activated:true})
+    var shops = await Shop.find({ activated: true })
       .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -75,7 +75,7 @@ router.get("/:catId", async (req, res) => {
   let page = req.query.page || 1;
   //this route should be paginated
   try {
-    var shops = await Shop.find({ category: req.params.catId,activated:true })
+    var shops = await Shop.find({ category: req.params.catId, activated: true })
       .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -98,7 +98,7 @@ router.get("/:catId/:district", async (req, res) => {
     var shops = await Shop.find({
       category: req.params.catId,
       district: district,
-      activated:true
+      activated: true
     })
       .populate("category")
       .skip((page - 1) * perPage)
@@ -117,7 +117,7 @@ router.get("/:catId/:district", async (req, res) => {
     res.status(500).send({ message: "server error" + e });
   }
 });
-
+const mailer = require("nodemailer");
 //add new shops
 router.post("/", upload.single("logo"), async (req, res) => {
   var { email, password } = req.body;
@@ -142,12 +142,30 @@ router.post("/", upload.single("logo"), async (req, res) => {
           try {
             let shop = new Shop(req.body);
             let result = await shop.save();
-            res.status(201).send(result);
-          } catch (e) {
+            var transport = mailer.createTransport({
+              service: "gmail",
+              auth: {
+                "user": process.env.email,
+                "pass": process.env.password,
+              }
+            });
+            var mailOptions = {
+              from: process.env.email,
+              to: "tommie@intnet.mu",
+              subject: "new services created",
+              text: result
+            };
             try{
-              await User.findOneAndDelete({email:email});
+              var nresult=await transport.sendMail(mailOptions);
+             
             }
             catch(e){}
+            res.status(201).send(result);
+          } catch (e) {
+            try {
+              await User.findOneAndDelete({ email: email });
+            }
+            catch (e) { }
             console.log(req.logo);
             fs.unlinkSync(appDir + req.logo);
             res.status(400).send(e);

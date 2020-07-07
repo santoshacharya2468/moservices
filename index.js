@@ -7,8 +7,8 @@ const Shop = require("./models/shop");
 const appMiddleware = require("./middlewares/appmiddleware");
 //models
 const User = require("./models/user");
-const dotenv = require("dotenv");
-dotenv.config();
+// const dotenv = require("dotenv");
+// dotenv.config();
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
 
@@ -37,6 +37,7 @@ const adminShopRoute=require("./routes/adminShopRoute");
 const adminCategoryRoute=require("./routes/adminCategoryRoute");
 const admin=require("./routes/adminDashBoard");
 const authorization = require("./middlewares/authorization");
+const isAdmin=require("./middlewares/isAdmin");
 const bannerRoute=require("./routes/bannerRoute");
 app.use("/account", appMiddleware, accountRoute);
 app.use("/shop", appMiddleware, shopRoute);
@@ -47,10 +48,18 @@ app.use("/click", appMiddleware, clickRoute);
 app.use("/like", appMiddleware, likeRoute);
 app.use("/banner",bannerRoute);
 //admin route
-app.use("/admin-shop",adminShopRoute);
-app.use("/admin-category",adminCategoryRoute);
-app.use("/admin",authorization,admin);
+app.use("/admin-shop",isAdmin,adminShopRoute);
+app.use("/admin-category",isAdmin,adminCategoryRoute);
+app.use("/admin",isAdmin,admin);
+const json2csv=require("json2csv");
+app.get("/csvfile",isAdmin,async(req,res)=>{
+  var fields=['businessName'];
+  
+  var file=json2csv.parse({data:await Shop.find()});
+  res.attachment("list.csv");
+  res.send(file);
 
+});
 
 //search route
 app.get("/search/:query", async (req, res) => {
@@ -111,3 +120,5 @@ app.get("/provider/:shopId", async (req, res) => {
     res.status(500).send({ message: "server error" + e });
   }
 });
+
+

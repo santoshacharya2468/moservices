@@ -44,7 +44,7 @@ router.get("/:catId", async (req, res) => {
   }
 });
 //activate or deactivate a shop
-router.patch("/:shopId",authorization,async(req,res)=>{
+router.patch("/:shopId",async(req,res)=>{
     try{
       await Shop.findByIdAndUpdate(req.params.shopId,{activated:req.body.status});
       res.send(await Shop.findById(req.params.shopId));
@@ -54,7 +54,7 @@ router.patch("/:shopId",authorization,async(req,res)=>{
     }
   });
   //delete a shop with given  id
-  router.delete("/:shopId",authorization,async(req,res)=>{
+  router.delete("/:shopId",async(req,res)=>{
     try{
       await Shop.findByIdAndRemove(req.params.shopId);
       res.status(204).send();

@@ -34,21 +34,18 @@ router.post("/login", async (req, res) => {
   try {
     let user = await User.findOne({ email: email });
     if (user != null) {
+      var isAdmin=user.isAdmin ||false;
       try {
         let status = await bcrypt.compare(password, user.password);
         if (status) {
           try {
             let token = jsonwebtoken.sign(
-              { email: user.email, id: user._id },
+              { email: user.email, id: user._id,isAdmin:isAdmin},
               "53465FDSFf##%#%$%",
               {
                 expiresIn: "60 days",
               }
             );
-            console.log(user);
-            var isAdmin=user.isAdmin ||false;
-
-           
             res.json({ token: token, id: user._id,isAdmin:isAdmin});
           } catch (e) {
             res.status(500).send({ message: "Error signin...."});
