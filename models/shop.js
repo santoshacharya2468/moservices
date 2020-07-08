@@ -54,18 +54,18 @@ const shopSchema = mongoose.Schema({
       required: true,
     },
   ],
-  packageDuration: {
-    duration: {
-      //like 3 months 6 months and 1 year
-      //we have to provide duration  as a number of months
-      type: Number,
-      required: true,
-    },
-    startOn: {
-      type: Date,
-      required: true,
-    },
-  },
+  // packageDuration: {
+  //   duration: {
+  //     //like 3 months 6 months and 1 year
+  //     //we have to provide duration  as a number of months
+  //     type: Number,
+  //     required: true,
+  //   },
+  //   startOn: {
+  //     type: Date,
+  //     required: true,
+  //   },
+  // },
   activated: {
     type: Boolean,
     default: true,
