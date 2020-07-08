@@ -9,7 +9,7 @@ router.post("/register", async (req, res) => {
   try {
     let user = await User.findOne({ email: email });
     if (!user) {
-      res.status(401).json({ message: "email or password invalid" });
+      res.status(401).json({ message: "email or password invalid" +user});
     }
     let result = bcrypt.compare(password, user.password);
     if (result) {
@@ -23,11 +23,11 @@ router.post("/register", async (req, res) => {
         );
         res.json({ token: token, id: user._id });
       } catch (error) {
-        res.status(401).json({ message: "email or password invalid" });
+        res.status(401).json({ message: "email or password invalid" +error});
       }
     }
   } catch (error) {
-    res.status(401).json({ message: "email or password invalid" });
+    res.status(401).json({ message: "email or password invalid" +error});
   }
 });
 var transport = mailer.createTransport({
