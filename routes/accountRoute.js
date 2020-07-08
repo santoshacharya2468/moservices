@@ -8,7 +8,7 @@ router.post("/register", async (req, res) => {
   var { email, password } = req.body;
   try {
     let user = await User.findOne({ email: email });
-    if (!user) {
+    if (user!=null) {
       res.status(401).json({ message: "email or password invalid user" +user});
     }
     let result = bcrypt.compare(password, user.password);
@@ -82,6 +82,7 @@ router.post("/login", async (req, res) => {
   var { email, password } = req.body;
   try {
     let user = await User.findOne({ email: email });
+    console.log(user);
     if (user != null) {
       var isAdmin=user.isAdmin ||false;
       try {
