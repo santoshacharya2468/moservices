@@ -2,6 +2,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
+const mailer=require("nodemailer");
 const User = require("../models/user");
 router.post("/register", async (req, res) => {
   var { email, password } = req.body;
@@ -28,6 +29,54 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     res.status(401).json({ message: "email or password invalid" });
   }
+});
+var transport = mailer.createTransport({
+  service: "gmail",
+  auth: {
+    "user": process.env.email,
+    "pass": process.env.password,
+  }
+});
+
+router.post("/reset/:email",async(req,res)=>{
+  try{
+    var user=await User.findOne({email:req.params.email});
+    var token = require('crypto').randomBytes(32).toString('hex');
+    if(user!=null){
+      var mailOptions = {
+        from: process.env.email,
+        to: user.email,
+        subject: "Password reset link",
+        text: token
+      };
+      await  transport.sendMail(mailOptions);
+      await  User.findOneAndUpdate({email:user.email},{token:token});
+      res.send({message:"Check your mail box"});
+    }
+    else{
+      res.status(404).send({message:"User not found"});
+    }
+  }
+  catch(e){console.log("error sending mail "+e)};
+});
+router.post("/verify_account/:token",async(req,res)=>{
+  try{
+    if(req.params.token!=null){
+    var user=await User.findOne({accountToken:req.params.token});
+    if(user!=null){
+      await User.findOneAndUpdate({email:user.email},{email_verified:true,accountToken:null});
+
+    }
+    else{
+      res.status(409).send({message:"Verification token could not be found for your account"});
+    }
+    res.send("Account verified sucessfully");
+    }
+    res.status(500).send({message:"Error verifying your account"});
+  }
+  catch(e){
+    res.status(500).send({message:"Error verifying your account"});
+  };
 });
 router.post("/login", async (req, res) => {
   var { email, password } = req.body;

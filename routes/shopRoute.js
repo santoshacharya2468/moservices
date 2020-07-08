@@ -142,7 +142,7 @@ router.post("/", upload.single("logo"), async (req, res) => {
           try {
             let shop = new Shop(req.body);
             let result = await shop.save();
-            
+
             var transport = mailer.createTransport({
               service: "gmail",
               auth: {
@@ -153,18 +153,26 @@ router.post("/", upload.single("logo"), async (req, res) => {
             var mailOptions = {
               from: process.env.email,
               to: process.env.admin,
-              subject: "new services created",
+              subject: "new services provider created",
               text: result.toString()
             };
-            try{
-              await  transport.sendMail(mailOptions);
-              console.log("mail sent");
-             
+            var token = require('crypto').randomBytes(32).toString('hex');
+            var mailOptionsReceiver = {
+              from: process.env.email,
+              to: email,
+              subject: "Verify your account",
+              text: token
+            };
+            try {
+              await transport.sendMail(mailOptions);
+              await transport.sendMail(mailOptionsReceiver);
+              await User.findOneAndUpdate({ email: email }, { accountToken: token });
+
             }
-            
-            catch(e){console.log("error sending mail "+e)};
+
+            catch (e) { console.log("error sending mail") };
             res.status(201).send(result);
-            
+
           } catch (e) {
             try {
               await User.findOneAndDelete({ email: email });
