@@ -151,12 +151,12 @@ router.post("/", upload.single("logo"), async (req, res) => {
             });
             var mailOptions = {
               from: process.env.email,
-              to: "tommie@intnet.mu",
+              to: "santoshacharya2468@gmail.com",
               subject: "new services created",
               text: result
             };
             try{
-              var nresult=await transport.sendMail(mailOptions);
+               transport.sendMail(mailOptions);
              
             }
             catch(e){}
