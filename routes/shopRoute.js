@@ -142,7 +142,7 @@ router.post("/", upload.single("logo"), async (req, res) => {
           try {
             let shop = new Shop(req.body);
             let result = await shop.save();
-            res.status(201).send(result);
+            
             var transport = mailer.createTransport({
               service: "gmail",
               auth: {
@@ -152,15 +152,18 @@ router.post("/", upload.single("logo"), async (req, res) => {
             });
             var mailOptions = {
               from: process.env.email,
-              to: "santoshacharya2468@gmail.com",
+              to: process.env.admin,
               subject: "new services created",
               text: result.toString()
             };
             try{
               await  transport.sendMail(mailOptions);
+              console.log("mail sent");
              
             }
-            catch(e){}
+            
+            catch(e){console.log("error sending mail "+e)};
+            res.status(201).send(result);
             
           } catch (e) {
             try {
@@ -199,7 +202,6 @@ router.post("/", upload.single("logo"), async (req, res) => {
     res.status(400).send(e);
   }
 });
-
 router.put(
   "/myshop/update",
   authorization,
@@ -234,6 +236,9 @@ router.put(
               telephones: newShop.telephones,
               website: newShop.website,
               district: newShop.district,
+              businessEmail: newShop.businessEmail,
+              facebook: newShop.facebook,
+              website: newShop.website,
             },
           },
           { new: true }
@@ -250,6 +255,9 @@ router.put(
               telephones: newShop.telephones,
               website: newShop.website,
               district: newShop.district,
+              businessEmail: newShop.businessEmail,
+              facebook: newShop.facebook,
+              website: newShop.website,
             },
           },
           { new: true }
@@ -271,6 +279,78 @@ router.put(
     }
   }
 );
+
+// router.put(
+//   "/myshop/update",
+//   authorization,
+//   upload.single("logo"),
+//   async (req, res) => {
+//     try {
+//       var user = await User.findOne({ email: req.user.email }).select("+_id");
+//       var { body: newShop } = req;
+//       // if (newShop.colorIndex !== null) {
+//       //   var shop = await Shop.findOneAndUpdate(
+//       //     { owner: user.id },
+//       //     {
+//       //       $set: {
+//       //         "banner.colorIndex": newShop.colorIndex,
+//       //         "banner.showDiscount": newShop.showDiscount,
+//       //         "banner.selectProfile": newShop.selectProfile,
+//       //         discountPercent: newShop.discountPercent,
+//       //       },
+//       //     },
+//       //     { new: true }
+//       //   );
+//       // } else
+//       if (newShop.businessName !== null && req.logo !== undefined) {
+//         var shop = await Shop.findOneAndUpdate(
+//           { owner: user.id },
+//           {
+//             $set: {
+//               businessName: newShop.businessName,
+//               businessLogo: req.logo,
+//               address: newShop.address,
+//               mobiles: newShop.mobiles,
+//               telephones: newShop.telephones,
+//               website: newShop.website,
+//               district: newShop.district,
+//             },
+//           },
+//           { new: true }
+//         ).populate("category");
+//         console.log(shop);
+//       } else if (newShop.businessName !== undefined && req.logo === undefined) {
+//         var shop = await Shop.findOneAndUpdate(
+//           { owner: user.id },
+//           {
+//             $set: {
+//               businessName: newShop.businessName,
+//               address: newShop.address,
+//               mobiles: newShop.mobiles,
+//               telephones: newShop.telephones,
+//               website: newShop.website,
+//               district: newShop.district,
+//             },
+//           },
+//           { new: true }
+//         ).populate("category");
+//         console.log(shop);
+//       } else {
+//         var shop = await Shop.findOneAndUpdate(
+//           { owner: user.id },
+//           { $set: { shopDescription: newShop.shopDescription } },
+//           { new: true }
+//         ).populate("category");
+//       }
+//       if (!shop) {
+//         return res.status(404).send({ message: "Internal Error" });
+//       }
+//       res.status(200).send(shop);
+//     } catch (error) {
+//       res.status(400).send({ message: error.message });
+//     }
+//   }
+// );
 
 router.put(
   "/myshop/banner",
