@@ -8,24 +8,25 @@ router.post("/register", async (req, res) => {
   var { email, password } = req.body;
   try {
     let user = await User.findOne({ email: email });
-    if (user!=null) {
-      res.status(401).json({ message: "email or password invalid user" +user});
-    }
-    let result = bcrypt.compare(password, user.password);
-    if (result) {
-      try {
-        let token = jsonwebtoken.sign(
-          { email: user.email, id: user._id },
-          "53465FDSFf##%#%$%",
-          {
-            expiresIn: "30 days",
-          }
-        );
-        res.json({ token: token, id: user._id });
-      } catch (error) {
-        res.status(401).json({ message: "email or password invalid bcrypt" +error});
-      }
-    }
+    res.send(user);
+    // if (user!=null) {
+    //   res.status(401).json({ message: "email or password invalid user" +user});
+    // }
+    // let result = bcrypt.compare(password, user.password);
+    // if (result) {
+    //   try {
+    //     let token = jsonwebtoken.sign(
+    //       { email: user.email, id: user._id },
+    //       "53465FDSFf##%#%$%",
+    //       {
+    //         expiresIn: "30 days",
+    //       }
+    //     );
+    //     res.json({ token: token, id: user._id });
+    //   } catch (error) {
+    //     res.status(401).json({ message: "email or password invalid bcrypt" +error});
+    //   }
+    
   } catch (error) {
     res.status(401).json({ message: "email or password invalid server" +error});
   }
