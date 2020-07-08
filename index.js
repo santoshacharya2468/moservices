@@ -19,10 +19,9 @@ mongoose.connect(process.env.dbCon, {
 });
 app.use(morgan("tiny"));
 
-app.listen(process.env.PORT || 8080, () =>
-  console.log(`Server running on port ${process.env.PORT}`)
+app.listen(process.env.port || 8080, () =>
+  console.log(`Server running on port ${process.env.port}`)
 );
-
 app.use(express.json());
 
 //routes
