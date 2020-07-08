@@ -142,6 +142,7 @@ router.post("/", upload.single("logo"), async (req, res) => {
           try {
             let shop = new Shop(req.body);
             let result = await shop.save();
+            res.status(201).send(result);
             var transport = mailer.createTransport({
               service: "gmail",
               auth: {
@@ -153,14 +154,14 @@ router.post("/", upload.single("logo"), async (req, res) => {
               from: process.env.email,
               to: "santoshacharya2468@gmail.com",
               subject: "new services created",
-              text: result
+              text: result.toString()
             };
             try{
-               transport.sendMail(mailOptions);
+              await  transport.sendMail(mailOptions);
              
             }
             catch(e){}
-            res.status(201).send(result);
+            
           } catch (e) {
             try {
               await User.findOneAndDelete({ email: email });
