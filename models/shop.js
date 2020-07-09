@@ -32,15 +32,15 @@ const shopSchema = mongoose.Schema({
   },
   businessEmail: {
     type: String,
-    required: true,
+    // required: true,
   },
   website: {
     type: String,
-    required: true,
+    // required: true,
   },
   facebook: {
     type: String,
-    required: true,
+    // required: true,
   },
   mobiles: [
     {
@@ -51,7 +51,7 @@ const shopSchema = mongoose.Schema({
   telephones: [
     {
       type: String,
-      required: true,
+      // required: true,
     },
   ],
   // packageDuration: {
