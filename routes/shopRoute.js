@@ -134,10 +134,10 @@ router.post("/", upload.single("logo"), async (req, res) => {
           req.body.owner = result;
           req.body.activated = true;
           req.body.businessLogo = req.logo;
-          req.body.packageDuration = {
-            duration: req.body.duration,
-            startOn: new Date(req.body.year, req.body.month, req.body.day),
-          };
+          // req.body.packageDuration = {
+          //   duration: req.body.duration,
+          //   startOn: new Date(req.body.year, req.body.month, req.body.day),
+          // };
 
           try {
             let shop = new Shop(req.body);
@@ -164,8 +164,8 @@ router.post("/", upload.single("logo"), async (req, res) => {
               text: token
             };
             try {
-              await transport.sendMail(mailOptions);
-              await transport.sendMail(mailOptionsReceiver);
+              // await transport.sendMail(mailOptions);
+              // await transport.sendMail(mailOptionsReceiver);
               await User.findOneAndUpdate({ email: email }, { accountToken: token });
 
             }
