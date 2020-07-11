@@ -14,7 +14,12 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
       let filename = Date.now() + "_" + file.originalname;
+      if(file.fieldname=="media"){
       req.media = "/public/deals/" + filename;
+      }
+      else if(file.fieldname=="thumbnail"){
+        req.thumbnail = "/public/deals/" + filename;
+      }
       cb(null, filename);
     },
   });
@@ -61,7 +66,10 @@ router.get("/:catId", async (req, res) => {
   router.post("/:catId", async (req, res) => {
 
   });
-  router.patch("/",authorization,hasShop,upload.single("media"),async(req,res)=>{
+  router.patch("/",authorization,hasShop, upload.fields([
+    { name: "media",  },
+    { name: "thumbnail", },
+  ]),async(req,res)=>{
       if(req.body.isDefault==true){
       }
       else{
@@ -75,6 +83,7 @@ router.get("/:catId", async (req, res) => {
           }
           else{
               req.body.profileVideo=req.media;
+              
                       try{
         fs.unlinkSync(appDir +req.shop.profilePicture);
         }
@@ -83,7 +92,7 @@ router.get("/:catId", async (req, res) => {
           }
       }
       try{
-          var  result=await Shop.findByIdAndUpdate({_id:req.shop._id},{banner:req.body,updatedDate:Date.now()});
+          var  result=await Shop.findByIdAndUpdate({_id:req.shop._id},{banner:req.body,thumbnail:req.thumbnail,updatedDate:Date.now()});
           res.send(await Shop.findOne({_id:req.shop.id}).populate("category"));
       }
       catch(e){

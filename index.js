@@ -19,9 +19,10 @@ mongoose.connect(process.env.dbCon, {
 });
 app.use(morgan("tiny"));
 
-app.listen(process.env.port || 8080, () =>
-  console.log(`Server running on port ${process.env.port}`)
+app.listen(process.env.PORT || 8080, () =>
+  console.log(`Server running on port ${process.env.PORT}`)
 );
+
 app.use(express.json());
 
 //routes
@@ -50,13 +51,9 @@ app.use("/banner",bannerRoute);
 app.use("/admin-shop",isAdmin,adminShopRoute);
 app.use("/admin-category",isAdmin,adminCategoryRoute);
 app.use("/admin",isAdmin,admin);
-const json2csv=require("json2csv");
+
 app.get("/csvfile",isAdmin,async(req,res)=>{
-  var fields=['businessName'];
   
-  var file=json2csv.parse({data:await Shop.find()});
-  res.attachment("list.csv");
-  res.send(file);
 
 });
 
@@ -119,5 +116,3 @@ app.get("/provider/:shopId", async (req, res) => {
     res.status(500).send({ message: "server error" + e });
   }
 });
-
-
