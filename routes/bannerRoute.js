@@ -18,6 +18,10 @@ const storage = multer.diskStorage({
       req.media = "/public/deals/" + filename;
       }
       else if(file.fieldname=="thumbnail"){
+        try{
+           fs.unlinkSync(appDir +req.shop.banner.thumbnail);
+        }
+        catch(e){}
         req.thumbnail = "/public/deals/" + filename;
       }
       cb(null, filename);
@@ -92,7 +96,8 @@ router.get("/:catId", async (req, res) => {
           }
       }
       try{
-          var  result=await Shop.findByIdAndUpdate({_id:req.shop._id},{banner:req.body,thumbnail:req.thumbnail,updatedDate:Date.now()});
+          req.body.thumbnail=req.thumbnail;
+          var  result=await Shop.findByIdAndUpdate({_id:req.shop._id},{banner:req.body,updatedDate:Date.now()});
           res.send(await Shop.findOne({_id:req.shop.id}).populate("category"));
       }
       catch(e){
