@@ -15,6 +15,10 @@ const WorkGallerySchema=mongoose.Schema({
     imageUrl:{
         type:String,
         required:true
+    },
+    thumbnail:{
+        type:String,
+        required:true
     }
 
 });
