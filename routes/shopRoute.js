@@ -46,6 +46,7 @@ router.get("/", async (req, res) => {
   try {
     var shops = await Shop.find({ activated: true })
       .populate("category")
+      .populate("owner","email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });
@@ -77,6 +78,7 @@ router.get("/:catId", async (req, res) => {
   try {
     var shops = await Shop.find({ category: req.params.catId, activated: true })
       .populate("category")
+      .populate("owner","email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });
@@ -101,6 +103,7 @@ router.get("/:catId/:district", async (req, res) => {
       activated: true
     })
       .populate("category")
+      .populate("owner","email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });

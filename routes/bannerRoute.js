@@ -37,6 +37,7 @@ router.get("/", async (req, res) => {
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate("category")
+      .populate("owner","email")
       .sort({ registeredAt: -1 });
 
     if ((await Shop.find({activated:true}).count()) > perPage * page) {
@@ -55,6 +56,7 @@ router.get("/:catId", async (req, res) => {
       var shops = await Shop.find({activated:true,category:req.params.catId})
         .skip((page - 1) * perPage)
         .populate("category")
+        .populate("owner","email")
         .limit(perPage)
         .sort({ updatedDate: -1 });
       if ((await Shop.find({activated:true,category:req.params.catId}).count()) > perPage * page) {

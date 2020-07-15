@@ -66,6 +66,7 @@ app.get("/search/:query", async (req, res) => {
       activated:true,
     })
       .populate("category")
+      .populate("owner","email")
       .limit(20);
     res.json(shops);
   } catch (e) {
@@ -80,6 +81,7 @@ app.get("/admin-search/:query", async (req, res) => {
     
     })
       .populate("category")
+      .populate("owner","email")
       .limit(20);
     res.json(shops);
   } catch (e) {
@@ -95,6 +97,7 @@ app.get("/admin-search/:catId/:query", async (req, res) => {
       
     })
       .populate("category")
+      .populate("owner","email")
       .limit(20);
     res.json(shops);
   } catch (e) {
@@ -104,7 +107,7 @@ app.get("/admin-search/:catId/:query", async (req, res) => {
 app.get("/provider/:shopId", async (req, res) => {
   //this route should be paginated
   try {
-    var shop = await Shop.findById(req.params.shopId).populate("category");
+    var shop = await Shop.findById(req.params.shopId).populate("category").populate("owner","email");
     if (shop != null) {
       res.json(shop);
     } else {
