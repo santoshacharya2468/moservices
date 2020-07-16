@@ -65,7 +65,7 @@ router.get("/", async (req, res) => {
 router.get("/myshop", authorization, async (req, res) => {
   try {
     var user = await User.findOne({ email: req.user.email }).select("+_id");
-    var shop = await Shop.findOne({ owner: user.id }).populate("category");
+    var shop = await Shop.findOne({ owner: user.id }).populate("category").populate("owner","email");
 
     res.status(200).json(shop);
   } catch (error) {
