@@ -47,7 +47,6 @@ router.delete("/:galleryId", authorization, hasShop, async (req, res) => {
 });
 router.patch("/:galleryId", authorization, hasShop, async (req, res) => {
     try {
-        const gallery = await WorkGallery.findById(req.params.galleryId);
         await WorkGallery.findOneAndUpdate({ _id: req.params.galleryId, shop: req.shop },{caption:req.body.caption});
         const gallery = await WorkGallery.findById(req.params.galleryId);
         res.send(gallery);
