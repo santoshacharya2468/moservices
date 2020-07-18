@@ -183,7 +183,9 @@ router.post("/", upload.single("logo"), async (req, res) => {
             catch (e) { }
             console.log(req.logo);
             fs.unlinkSync(appDir + req.logo);
-            res.status(400).send(e);
+            res
+        .status(409)
+        .send({ message: `shop with  given name is  already in use` });
           }
         } catch (e) {
           res.status(400).send(e);
