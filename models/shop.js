@@ -63,7 +63,6 @@ const shopSchema = mongoose.Schema({
   },
  
   banner: {
-  
     showDiscount: { type: Boolean, default: false },
     colorIndex: { type: Number, default: 0 },
     isDefault :{ type: Boolean, default: true },

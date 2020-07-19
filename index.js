@@ -56,6 +56,7 @@ app.get("/csvfile",isAdmin,async(req,res)=>{
   
 
 });
+app.set("view engine", "ejs");
 
 //search route
 app.get("/search/:query", async (req, res) => {

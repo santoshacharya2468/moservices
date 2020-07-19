@@ -5,6 +5,8 @@ const multer = require("multer");
 var path = require("path");
 const User = require("../models/user");
 var fs = require("fs");
+const ejs = require("ejs");
+const nodemailer = require("nodemailer");
 const perPage = 18;
 const jsonwebtoken = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -144,45 +146,71 @@ router.post("/", upload.single("logo"), async (req, res) => {
 
           try {
             let shop = new Shop(req.body);
-            let result = await shop.save();
+            let results = await shop.save();
+            let saveShop = await Shop.findOne({
+              owner: results.owner,
+            })
+              .populate("category")
+              .populate("owner");
+            let result = saveShop.toObject();
 
-            var transport = mailer.createTransport({
+            var transport = nodemailer.createTransport({
               service: "gmail",
               auth: {
-                "user": process.env.email,
-                "pass": process.env.password,
-              }
+                user: process.env.email,
+                pass: process.env.password,
+              },
             });
-            var mailOptions = {
+            result.packagePrice = process.env.packagePrice;
+            var token = require("crypto").randomBytes(32).toString("hex");
+            result.verificationLink =
+              `http://` + req.headers.host + `/account/verify_account/${token}`;
+
+            let htmlFile1 = await ejs.renderFile(
+              path.join(__dirname, "/email/shop-confirm.ejs"),
+              {
+                result: result,
+              }
+            );
+            let htmlFile2 = await ejs.renderFile(
+              path.join(__dirname, "/email/admin-notification.ejs"),
+              {
+                result: result,
+              }
+            );
+            var shopOwnerMailOptions = {
+              from: process.env.email,
+              to: result.owner.email,
+              subject: "Account Verification",
+              html: htmlFile1,
+            };
+            var adminMailOptions = {
               from: process.env.email,
               to: process.env.admin,
-              subject: "new services provider created",
-              text: result.toString()
+              subject: "New shop registered!",
+              html: htmlFile2,
             };
-            var token = require('crypto').randomBytes(32).toString('hex');
-            var mailOptionsReceiver = {
-              from: process.env.email,
-              to: email,
-              subject: "Verify your account",
-              text: token
-            };
-            try {
-              // await transport.sendMail(mailOptions);
-              // await transport.sendMail(mailOptionsReceiver);
-              await User.findOneAndUpdate({ email: email }, { accountToken: token });
-
-            }
-
-            catch (e) { console.log("error sending mail") };
             res.status(201).send(result);
+            try {
+              await transport.sendMail(shopOwnerMailOptions);
+              await transport.sendMail(adminMailOptions);
+              await User.findOneAndUpdate(
+                { email: email },
+                { accountToken: token }
+              );
+            } catch (e) {
+              console.log("error sending mail");
+            }
 
           } catch (e) {
             try {
               await User.findOneAndDelete({ email: email });
             }
             catch (e) { }
-            console.log(req.logo);
+           try{
             fs.unlinkSync(appDir + req.logo);
+           }
+           catch(e){}
             res
         .status(409)
         .send({ message: `shop with  given name is  already in use` });
@@ -196,6 +224,10 @@ router.post("/", upload.single("logo"), async (req, res) => {
           .send({ message: "error encrypting password try again" + e });
       }
     } else {
+      try{
+        fs.unlinkSync(appDir + req.logo);
+       }
+       catch(e){}
       res
         .status(409)
         .send({ message: `shop with  given email already in use` });
