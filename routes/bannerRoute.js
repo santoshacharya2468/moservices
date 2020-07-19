@@ -81,14 +81,18 @@ router.patch("/", authorization, hasShop, upload.fields([
   else {
     if (req.body.type == "image") {
       if (req.media != null) {
+        console.log("not null");
         req.body.profilePicture = req.media;
         try {
-          fs.unlinkSync(appDir + req.shop.profileVideo);
+          
+          fs.unlinkSync(appDir + req.shop.banner.profilePicture);
+
         }
         catch (e) { }
         req.body.profileVideo = null;
       }
       else{
+        console.log("null");
         req.body.profilePicture=req.shop.banner.profilePicture;
       }
 
@@ -105,7 +109,7 @@ router.patch("/", authorization, hasShop, upload.fields([
   }
   try {
     req.body.thumbnail = req.thumbnail;
-    req.body.banner.profilePicture=req.media || req.shop.banner.profilePicture;
+    req.body.profilePicture=req.media || req.shop.banner.profilePicture;
     var result = await Shop.findByIdAndUpdate({ _id: req.shop._id }, { banner: req.body, updatedDate: Date.now() });
     res.send(await Shop.findOne({ _id: req.shop.id }).populate("category").populate("owner", "email"));
   }
