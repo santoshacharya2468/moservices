@@ -46,7 +46,7 @@ router.get("/", async (req, res) => {
   try {
     var shops = await Shop.find({ activated: true })
       .populate("category")
-      .populate("owner","email")
+      .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });
@@ -65,7 +65,9 @@ router.get("/", async (req, res) => {
 router.get("/myshop", authorization, async (req, res) => {
   try {
     var user = await User.findOne({ email: req.user.email }).select("+_id");
-    var shop = await Shop.findOne({ owner: user.id }).populate("category").populate("owner","email");
+    var shop = await Shop.findOne({ owner: user.id })
+      .populate("category")
+      .populate("owner", "email");
 
     res.status(200).json(shop);
   } catch (error) {
@@ -78,7 +80,7 @@ router.get("/:catId", async (req, res) => {
   try {
     var shops = await Shop.find({ category: req.params.catId, activated: true })
       .populate("category")
-      .populate("owner","email")
+      .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });
@@ -100,10 +102,10 @@ router.get("/:catId/:district", async (req, res) => {
     var shops = await Shop.find({
       category: req.params.catId,
       district: district,
-      activated: true
+      activated: true,
     })
       .populate("category")
-      .populate("owner","email")
+      .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ _id: -1 });
@@ -149,43 +151,43 @@ router.post("/", upload.single("logo"), async (req, res) => {
             var transport = mailer.createTransport({
               service: "gmail",
               auth: {
-                "user": process.env.email,
-                "pass": process.env.password,
-              }
+                user: process.env.email,
+                pass: process.env.password,
+              },
             });
             var mailOptions = {
               from: process.env.email,
               to: process.env.admin,
               subject: "new services provider created",
-              text: result.toString()
+              text: result.toString(),
             };
-            var token = require('crypto').randomBytes(32).toString('hex');
+            var token = require("crypto").randomBytes(32).toString("hex");
             var mailOptionsReceiver = {
               from: process.env.email,
               to: email,
               subject: "Verify your account",
-              text: token
+              text: token,
             };
             try {
               // await transport.sendMail(mailOptions);
               // await transport.sendMail(mailOptionsReceiver);
-              await User.findOneAndUpdate({ email: email }, { accountToken: token });
-
+              await User.findOneAndUpdate(
+                { email: email },
+                { accountToken: token }
+              );
+            } catch (e) {
+              console.log("error sending mail");
             }
-
-            catch (e) { console.log("error sending mail") };
             res.status(201).send(result);
-
           } catch (e) {
             try {
               await User.findOneAndDelete({ email: email });
-            }
-            catch (e) { }
+            } catch (e) {}
             console.log(req.logo);
             fs.unlinkSync(appDir + req.logo);
             res
-        .status(409)
-        .send({ message: `shop with  given name is  already in use` });
+              .status(409)
+              .send({ message: `shop with  given name is  already in use` });
           }
         } catch (e) {
           res.status(400).send(e);
@@ -241,7 +243,9 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
         console.log(shop);
       } else if (newShop.businessName !== undefined && req.logo === undefined) {
         var shop = await Shop.findOneAndUpdate(
@@ -260,14 +264,18 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
         console.log(shop);
       } else {
         var shop = await Shop.findOneAndUpdate(
           { owner: user.id },
           { $set: { shopDescription: newShop.shopDescription } },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
       }
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
@@ -305,7 +313,9 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
       } else if (
         req.profilePicture == undefined &&
         req.profileVideo != undefined
@@ -324,7 +334,9 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
       } else if (
         req.profilePicture != undefined &&
         req.profileVideo == undefined
@@ -343,7 +355,9 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
       } else if (
         req.profilePicture == undefined &&
         req.profileVideo == undefined
@@ -362,7 +376,9 @@ router.put(
             },
           },
           { new: true }
-        ).populate("category").populate("owner","email");
+        )
+          .populate("category")
+          .populate("owner", "email");
       }
 
       if (!shop) {
