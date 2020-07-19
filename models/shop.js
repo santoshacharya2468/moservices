@@ -63,11 +63,11 @@ const shopSchema = mongoose.Schema({
   },
  
   banner: {
-  
     showDiscount: { type: Boolean, default: false },
     colorIndex: { type: Number, default: 0 },
     isDefault :{ type: Boolean, default: true },
     showNumber :{ type: Boolean, default: true },
+    showProfile :{ type: Boolean, default: true },
     profilePicture: {type: String,},
     profileVideo: {type: String,},
     thumbnail:{type:String},
