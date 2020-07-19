@@ -5,42 +5,42 @@ const multer = require("multer");
 var path = require("path");
 const User = require("../models/user");
 var fs = require("fs");
-const hasShop=require("../middlewares/hasShop");
+const hasShop = require("../middlewares/hasShop");
 const router = express.Router();
 var appDir = path.dirname(require.main.filename);
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, appDir + "/public/deals");
-    },
-    filename: (req, file, cb) => {
-      let filename = Date.now() + "_" + file.originalname;
-      if(file.fieldname=="media"){
+  destination: (req, file, cb) => {
+    cb(null, appDir + "/public/deals");
+  },
+  filename: (req, file, cb) => {
+    let filename = Date.now() + "_" + file.originalname;
+    if (file.fieldname == "media") {
       req.media = "/public/deals/" + filename;
+    }
+    else if (file.fieldname == "thumbnail") {
+      try {
+        fs.unlinkSync(appDir + req.shop.banner.thumbnail);
       }
-      else if(file.fieldname=="thumbnail"){
-        try{
-           fs.unlinkSync(appDir +req.shop.banner.thumbnail);
-        }
-        catch(e){}
-        req.thumbnail = "/public/deals/" + filename;
-      }
-      cb(null, filename);
-    },
-  });
+      catch (e) { }
+      req.thumbnail = "/public/deals/" + filename;
+    }
+    cb(null, filename);
+  },
+});
 const upload = multer({ storage: storage });
-const perPage=10;
+const perPage = 10;
 // get data from latest deals in home page
 router.get("/", async (req, res) => {
   let page = req.query.page || 1;
   try {
-    var shops = await Shop.find({activated:true})
+    var shops = await Shop.find({ activated: true })
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate("category")
-      .populate("owner","email")
+      .populate("owner", "email")
       .sort({ registeredAt: -1 });
 
-    if ((await Shop.find({activated:true}).count()) > perPage * page) {
+    if ((await Shop.find({ activated: true }).count()) > perPage * page) {
       var nextPage = Number(page) + 1;
     } else {
       nextPage = null;
@@ -51,62 +51,68 @@ router.get("/", async (req, res) => {
   }
 });
 router.get("/:catId", async (req, res) => {
-    let page = req.query.page || 1;
-    try {
-      var shops = await Shop.find({activated:true,category:req.params.catId})
-        .skip((page - 1) * perPage)
-        .populate("category")
-        .populate("owner","email")
-        .limit(perPage)
-        .sort({ updatedDate: -1 });
-      if ((await Shop.find({activated:true,category:req.params.catId}).count()) > perPage * page) {
-        var nextPage = Number(page) + 1;
-      } else {
-        nextPage = null;
-      }
-      res.json({ data: shops, perPage: perPage, next: nextPage });
-    } catch (e) {
-      res.status(500).send({ message: "server error" + e });
+  let page = req.query.page || 1;
+  try {
+    var shops = await Shop.find({ activated: true, category: req.params.catId })
+      .skip((page - 1) * perPage)
+      .populate("category")
+      .populate("owner", "email")
+      .limit(perPage)
+      .sort({ updatedDate: -1 });
+    if ((await Shop.find({ activated: true, category: req.params.catId }).count()) > perPage * page) {
+      var nextPage = Number(page) + 1;
+    } else {
+      nextPage = null;
     }
-  });
-  router.post("/:catId", async (req, res) => {
+    res.json({ data: shops, perPage: perPage, next: nextPage });
+  } catch (e) {
+    res.status(500).send({ message: "server error" + e });
+  }
+});
+router.post("/:catId", async (req, res) => {
 
-  });
-  router.patch("/",authorization,hasShop, upload.fields([
-    { name: "media",  },
-    { name: "thumbnail", },
-  ]),async(req,res)=>{
-      if(req.body.isDefault==true){
+});
+router.patch("/", authorization, hasShop, upload.fields([
+  { name: "media", },
+  { name: "thumbnail", },
+]), async (req, res) => {
+  if (req.body.isDefault == true) {
+  }
+  else {
+    if (req.body.type == "image") {
+      if (req.media != null) {
+        req.body.profilePicture = req.media;
+        try {
+          fs.unlinkSync(appDir + req.shop.profileVideo);
+        }
+        catch (e) { }
+        req.body.profileVideo = null;
       }
       else{
-          if(req.body.type=="image"){
-              req.body.profilePicture=req.media;
-                try{
-        fs.unlinkSync(appDir +req.shop.profileVideo);
-        }
-        catch(e){}
-              req.body.profileVideo=null;
-          }
-          else{
-              req.body.profileVideo=req.media;
-              
-                      try{
-        fs.unlinkSync(appDir +req.shop.profilePicture);
-        }
-        catch(e){}
-              req.body.profilePicture=null;
-          }
-      }
-      try{
-          req.body.thumbnail=req.thumbnail;
-          var  result=await Shop.findByIdAndUpdate({_id:req.shop._id},{banner:req.body,updatedDate:Date.now()});
-          res.send(await Shop.findOne({_id:req.shop.id}).populate("category").populate("owner","email"));
-      }
-      catch(e){
-          res.status(500).send({message:"server error"+e});
+        req.body.profilePicture=req.shop.banner.profilePicture;
       }
 
-  });
+    }
+    else {
+      req.body.profileVideo = req.media;
+
+      try {
+        fs.unlinkSync(appDir + req.shop.profilePicture);
+      }
+      catch (e) { }
+      req.body.profilePicture = null;
+    }
+  }
+  try {
+    req.body.thumbnail = req.thumbnail;
+    var result = await Shop.findByIdAndUpdate({ _id: req.shop._id }, { banner: req.body, updatedDate: Date.now() });
+    res.send(await Shop.findOne({ _id: req.shop.id }).populate("category").populate("owner", "email"));
+  }
+  catch (e) {
+    res.status(500).send({ message: "server error" + e });
+  }
+
+});
 
 
 // router.get("/myshop", authorization, async (req, res) => {
