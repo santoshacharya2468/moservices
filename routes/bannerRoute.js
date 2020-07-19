@@ -105,6 +105,7 @@ router.patch("/", authorization, hasShop, upload.fields([
   }
   try {
     req.body.thumbnail = req.thumbnail;
+    req.body.banner.profilePicture=req.media || req.shop.banner.profilePicture;
     var result = await Shop.findByIdAndUpdate({ _id: req.shop._id }, { banner: req.body, updatedDate: Date.now() });
     res.send(await Shop.findOne({ _id: req.shop.id }).populate("category").populate("owner", "email"));
   }
