@@ -166,7 +166,7 @@ router.post("/", upload.single("logo"), async (req, res) => {
             result.packagePrice = process.env.packagePrice;
             var token = require("crypto").randomBytes(32).toString("hex");
             result.verificationLink =
-              `http://` + req.headers.host + `/account/verify_account/${token}`;
+              `http://` + req.headers.host + `/verify_account/${token}`;
 
             let htmlFile1 = await ejs.renderFile(
               path.join(__dirname, "/email/shop-confirm.ejs"),

@@ -45,7 +45,7 @@ router.post("/reset/:email", async (req, res) => {
     var user = await User.findOne({ email: req.params.email });
     var token = require("crypto").randomBytes(32).toString("hex");
     let resetLink =
-      `http://` + req.headers.host + `/account/reset-password/${token}`;
+      `http://` + req.headers.host + `/password-reset/${token}`;
     if (user != null) {
       var mailOptions = {
         from: process.env.email,
@@ -63,55 +63,40 @@ router.post("/reset/:email", async (req, res) => {
     console.log("error sending mail " + e);
   }
 });
-router.post("/verify_account/:token", async (req, res) => {
-  try {
-    if (req.params.token != null) {
-      var user = await User.findOne({ accountToken: req.params.token });
-      if (user != null) {
-        await User.findOneAndUpdate(
-          { email: user.email },
-          { email_verified: true, accountToken: null }
-        );
-      } else {
-        res.status(409).send({
-          message: "Verification token could not be found for your account",
-        });
-      }
-      res.send("Account verified sucessfully");
-    }
-    res.status(500).send({ message: "Error verifying your account" });
-  } catch (e) {
-    res.status(500).send({ message: "Error verifying your account" });
-  }
-});
+
 router.post("/login", async (req, res) => {
   var { email, password } = req.body;
   try {
     let user = await User.findOne({ email: email });
-    console.log(user);
     if (user != null) {
-      var isAdmin = user.isAdmin || false;
-      try {
-        let status = await bcrypt.compare(password, user.password);
-        if (status) {
-          try {
-            let token = jsonwebtoken.sign(
-              { email: user.email, id: user._id, isAdmin: isAdmin },
-              "53465FDSFf##%#%$%",
-              {
-                expiresIn: "60 days",
-              }
-            );
-            res.json({ token: token, id: user._id, isAdmin: isAdmin });
-          } catch (e) {
-            res.status(500).send({ message: "Error signin...." });
+      if(user. email_verified){
+        var isAdmin = user.isAdmin || false;
+        try {
+          let status = await bcrypt.compare(password, user.password);
+          if (status) {
+            try {
+              let token = jsonwebtoken.sign(
+                { email: user.email, id: user._id, isAdmin: isAdmin },
+                "53465FDSFf##%#%$%",
+                {
+                  expiresIn: "60 days",
+                }
+              );
+              res.json({ token: token, id: user._id, isAdmin: isAdmin });
+            } catch (e) {
+              res.status(500).send({ message: "Error signin...." });
+            }
+          } else {
+            res.status(401).send({ message: "Email/password error...." });
           }
-        } else {
+        } catch (e) {
           res.status(401).send({ message: "Email/password error...." });
         }
-      } catch (e) {
-        res.status(401).send({ message: "Email/password error...." });
       }
+      else{
+        res.status(401).send({ message: "Please verify your account to login" });
+      }
+    
     } else {
       res.status(401).send({ message: "Email/password error...." });
     }
