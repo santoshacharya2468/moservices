@@ -47,7 +47,7 @@ app.post("/password-reset/:token",async(req,res)=>{
   }
 
 });
-app.post("/verify_account/:token", async (req, res) => {
+app.get("/verify_account/:token", async (req, res) => {
   try {
     if (req.params.token != null) {
       var user = await User.findOne({ accountToken: req.params.token });
