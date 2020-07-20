@@ -2,7 +2,11 @@ const Shop = require("../models/shop");
 const authorization = require("../middlewares/authorization");
 var fs = require("fs");
 const perPage = 18;
+const WorkGallery = require("../models/work_gallery");
 const express=require("express");
+const User=require("../models/user");
+var path = require("path");
+var appDir = path.dirname(require.main.filename);
 const router = express.Router();
 router.get("/", async (req, res) => {
   let page = req.query.page || 1;
@@ -56,8 +60,26 @@ router.patch("/:shopId",async(req,res)=>{
   //delete a shop with given  id
   router.delete("/:shopId",async(req,res)=>{
     try{
+      var shop=await Shop.findById(req.params.shopId);
       await Shop.findByIdAndRemove(req.params.shopId);
+      await User.findByIdAndRemove(shop.owner);
       res.status(204).send();
+      const galleres = await WorkGallery.find({ shop: req.params.shopId});
+      for(var i=0;i<datalength;i++){
+        var gallery=galleres[i];
+        try {
+          fs.unlinkSync(appDir + gallery.imageUrl);
+          fs.unlinkSync(appDir + gallery.thumbnail);
+        } 
+        catch (e) {}
+      }
+      try {
+        fs.unlinkSync(appDir + shop.businessLogo);
+      } catch (e) {}
+      try {
+        fs.unlinkSync(appDir + shop.banner.profilePicture);
+      } catch (e) {}
+      await WorkGallery.findOneAndRemove({shop: req.params.shopId});
     }
     catch(e){
       res.status(500).send(e);
