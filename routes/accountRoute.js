@@ -69,7 +69,6 @@ router.post("/login", async (req, res) => {
   try {
     let user = await User.findOne({ email: email });
     if (user != null) {
-      if(user. email_verified){
         var isAdmin = user.isAdmin || false;
         try {
           let status = await bcrypt.compare(password, user.password);
@@ -93,9 +92,7 @@ router.post("/login", async (req, res) => {
           res.status(401).send({ message: "Email/password error...." });
         }
       }
-      else{
-        res.status(401).send({ message: "Please verify your account to login" });
-      }
+    
     
     } else {
       res.status(401).send({ message: "Email/password error...." });
