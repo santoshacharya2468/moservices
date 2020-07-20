@@ -32,7 +32,7 @@ app.post("/password-reset/:token",async(req,res)=>{
       var user = await User.findOne({ token: req.params.token});
       if (user != null) {
         let hashPassword = await bcrypt.hash(req.body.psw, 10);
-        await User.findOneAndUpdate( {email:user.email},{password:hashPassword});
+        await User.findOneAndUpdate( {email:user.email},{password:hashPassword,token:null});
         res.send("Password reset success");
       } else {
         res.status(409).send("Password reset token could not be found for your account");
