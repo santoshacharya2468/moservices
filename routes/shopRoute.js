@@ -310,6 +310,7 @@ router.put(
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
       }
+      await Shop.findOneAndUpdate({ owner: user.id },{updatedDate: Date.now() });
       res.status(200).send(shop);
     } catch (error) {
       res.status(400).send({ message: error.message });
@@ -414,6 +415,7 @@ router.put(
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
       }
+      await Shop.findOneAndUpdate({ owner: user.id },{updatedDate: Date.now() });
       res.status(200).send(shop);
     } catch (error) {
       res.status(400).json({ message: error.message });
