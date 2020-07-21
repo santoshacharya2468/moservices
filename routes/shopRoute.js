@@ -14,9 +14,6 @@ const router = express.Router();
 var appDir = path.dirname(require.main.filename);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log(file.fieldname);
-    // // console.log("here");
-    // console.log(file);
     if (file.fieldname === "logo") {
       return cb(null, appDir + "/public/shops");
     } else if (file.fieldname === "profilePicture") {
@@ -29,14 +26,15 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     let filename = Date.now() + "_" + file.originalname;
     if (file.fieldname === "logo") {
-      req.logo = "/public/shops/" + filename;
+      // req.logo = "/public/shops/" + filename;
+      req.logo = filename;
     } else if (file.fieldname === "profilePicture") {
-      req.profilePicture = "/public/shops/profilepicture/" + filename;
+      // req.profilePicture = "/public/shops/profilepicture/" + filename;
+      req.profilePicture = filename;
     } else if (file.fieldname === "profileVideo") {
-      req.profileVideo = "/public/shops/profilevideo/" + filename;
+      // req.profileVideo = "/public/shops/profilevideo/" + filename;
+      req.profileVideo = filename;
     }
-    // req.profileVideo = "public/shops/profilevideo/" + filename;
-
     cb(null, filename);
   },
 });
@@ -125,6 +123,7 @@ router.get("/:catId/:district", async (req, res) => {
   }
 });
 const mailer = require("nodemailer");
+const hasShop = require("../middlewares/hasShop");
 //add new shops
 router.post("/", upload.single("logo"), async (req, res) => {
   var { email, password } = req.body;
@@ -240,24 +239,26 @@ router.post("/", upload.single("logo"), async (req, res) => {
     let result = await shop.save();
     res.status(201).send(result);
   } catch (e) {
-    try{
-    fs.unlinkSync(appDir + "/public/shops/" + req.logo);
-    }
-    catch(e){}
+    try {
+      fs.unlinkSync(appDir + "/public/shops/" + req.logo);
+    } catch (e) {}
     res.status(400).send(e);
   }
 });
 router.put(
   "/myshop/update",
   authorization,
+  hasShop,
   upload.single("logo"),
   async (req, res) => {
     try {
-      var user = await User.findOne({ email: req.user.email }).select("+_id");
+      //var user = await User.findOne({ email: req.user.email }).select("+_id");
       var { body: newShop } = req;
       if (newShop.businessName !== null && req.logo !== undefined) {
+        fs.unlinkSync(appDir + "/pubic/shops/" + req.shop.businessLogo);
         var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
+          // { owner: user.id },
+          { businessName: req.shop.businessName },
           {
             $set: {
               businessName: newShop.businessName,
@@ -276,10 +277,10 @@ router.put(
         )
           .populate("category")
           .populate("owner", "email");
-        console.log(shop);
       } else if (newShop.businessName !== undefined && req.logo === undefined) {
         var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
+          // { owner: user.id },
+          { businessName: req.shop.businessName },
           {
             $set: {
               businessName: newShop.businessName,
@@ -297,10 +298,10 @@ router.put(
         )
           .populate("category")
           .populate("owner", "email");
-        console.log(shop);
       } else {
         var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
+          //{ owner: user.id },
+          { businessName: req.shop.businessName },
           { $set: { shopDescription: newShop.shopDescription } },
           { new: true }
         )
@@ -310,7 +311,10 @@ router.put(
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
       }
-      await Shop.findOneAndUpdate({ owner: user.id },{updatedDate: Date.now() });
+      await Shop.findOneAndUpdate(
+        { owner: user.id },
+        { updatedDate: Date.now() }
+      );
       res.status(200).send(shop);
     } catch (error) {
       res.status(400).send({ message: error.message });
@@ -415,7 +419,10 @@ router.put(
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
       }
-      await Shop.findOneAndUpdate({ owner: user.id },{updatedDate: Date.now() });
+      await Shop.findOneAndUpdate(
+        { owner: user.id },
+        { updatedDate: Date.now() }
+      );
       res.status(200).send(shop);
     } catch (error) {
       res.status(400).json({ message: error.message });
