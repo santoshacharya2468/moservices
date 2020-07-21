@@ -68,6 +68,8 @@ const shopSchema = mongoose.Schema({
     isDefault :{ type: Boolean, default: true },
     showNumber :{ type: Boolean, default: true },
     showProfile :{ type: Boolean, default: true },
+    showFb :{ type: Boolean, default: true },
+    showWebsite :{ type: Boolean, default: true },
     profilePicture: {type: String,},
     profileVideo: {type: String,},
     thumbnail:{type:String},
