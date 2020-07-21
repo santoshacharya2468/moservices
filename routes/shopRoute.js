@@ -240,8 +240,10 @@ router.post("/", upload.single("logo"), async (req, res) => {
     let result = await shop.save();
     res.status(201).send(result);
   } catch (e) {
-    console.log(req.logo);
+    try{
     fs.unlinkSync(appDir + "/public/shops/" + req.logo);
+    }
+    catch(e){}
     res.status(400).send(e);
   }
 });
