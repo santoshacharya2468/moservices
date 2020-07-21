@@ -6,6 +6,7 @@ var appDir = path.dirname(require.main.filename);
 const multer = require("multer");
 const authorization = require("../middlewares/authorization");
 const hasShop = require("../middlewares/hasShop");
+const Shop = require("../models/shop");
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, appDir + "/public/gallery");
@@ -49,6 +50,7 @@ router.patch("/:galleryId", authorization, hasShop, async (req, res) => {
     try {
         await WorkGallery.findOneAndUpdate({ _id: req.params.galleryId, shop: req.shop },{caption:req.body.caption});
         const gallery = await WorkGallery.findById(req.params.galleryId);
+        await Shop.findByIdAndUpdate({ _id: req.shop._id }, {updatedDate: Date.now() });
         res.send(gallery);
     }
     catch (e) {
@@ -99,6 +101,7 @@ router.post("/", authorization, hasShop, upload.single("image"), async (req, res
         });
         Gallery.thumbnail = outputDir;
         var result = await Gallery.save();
+        await Shop.findByIdAndUpdate({ _id: req.shop._id }, {updatedDate: Date.now() });
         res.status(201).send(result);
     }
     catch (e) {
