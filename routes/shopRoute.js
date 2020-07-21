@@ -85,7 +85,7 @@ router.get("/:catId", async (req, res) => {
       .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .sort({ _id: -1 });
+      .sort({ updatedDate: -1 });
     if ((await Shop.count({ category: req.params.catId })) > perPage * page) {
       var nextPage = Number(page) + 1;
     } else {
@@ -110,7 +110,7 @@ router.get("/:catId/:district", async (req, res) => {
       .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .sort({ _id: -1 });
+     .sort({ updatedDate: -1 });
     if (
       (await Shop.count({ category: req.params.catId, district: district })) >
       perPage * page
