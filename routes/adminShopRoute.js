@@ -65,7 +65,7 @@ router.patch("/:shopId",async(req,res)=>{
       await User.findByIdAndRemove(shop.owner);
       res.status(204).send();
       const galleres = await WorkGallery.find({ shop: req.params.shopId});
-      for(var i=0;i<datalength;i++){
+      for(var i=0;i<galleres.length;i++){
         var gallery=galleres[i];
         try {
           fs.unlinkSync(appDir + gallery.imageUrl);
