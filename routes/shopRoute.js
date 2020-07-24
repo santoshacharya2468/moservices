@@ -26,14 +26,11 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     let filename = Date.now() + "_" + file.originalname;
     if (file.fieldname === "logo") {
-      // req.logo = "/public/shops/" + filename;
-      req.logo = filename;
+      req.logo = "/public/shops/" + filename;
     } else if (file.fieldname === "profilePicture") {
-      // req.profilePicture = "/public/shops/profilepicture/" + filename;
-      req.profilePicture = filename;
+      req.profilePicture = "/public/shops/profilepicture/" + filename;
     } else if (file.fieldname === "profileVideo") {
-      // req.profileVideo = "/public/shops/profilevideo/" + filename;
-      req.profileVideo = filename;
+      req.profileVideo = "/public/shops/profilevideo/" + filename;
     }
     cb(null, filename);
   },
@@ -83,7 +80,7 @@ router.get("/:catId", async (req, res) => {
       .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .sort({ updatedDate: -1 });
+      .sort({ _id: -1 });
     if ((await Shop.count({ category: req.params.catId })) > perPage * page) {
       var nextPage = Number(page) + 1;
     } else {
@@ -108,7 +105,7 @@ router.get("/:catId/:district", async (req, res) => {
       .populate("owner", "email")
       .skip((page - 1) * perPage)
       .limit(perPage)
-     .sort({ updatedDate: -1 });
+      .sort({ _id: -1 });
     if (
       (await Shop.count({ category: req.params.catId, district: district })) >
       perPage * page
@@ -234,16 +231,6 @@ router.post("/", upload.single("logo"), async (req, res) => {
   }
 
   // req.body.packageDuration.startOn=new Date(req.body.year,req.body.month,req.body.day);
-  try {
-    let shop = new Shop(req.body);
-    let result = await shop.save();
-    res.status(201).send(result);
-  } catch (e) {
-    try {
-      fs.unlinkSync(appDir + "/public/shops/" + req.logo);
-    } catch (e) {}
-    res.status(400).send(e);
-  }
 });
 router.put(
   "/myshop/update",
@@ -254,8 +241,11 @@ router.put(
     try {
       //var user = await User.findOne({ email: req.user.email }).select("+_id");
       var { body: newShop } = req;
+      let date = Date.now();
       if (newShop.businessName !== null && req.logo !== undefined) {
-        fs.unlinkSync(appDir + "/pubic/shops/" + req.shop.businessLogo);
+        try {
+          fs.unlinkSync(appDir + req.shop.businessLogo);
+        } catch (e) {}
         var shop = await Shop.findOneAndUpdate(
           // { owner: user.id },
           { businessName: req.shop.businessName },
@@ -271,6 +261,7 @@ router.put(
               businessEmail: newShop.businessEmail,
               facebook: newShop.facebook,
               website: newShop.website,
+              updatedDate: date,
             },
           },
           { new: true }
@@ -292,6 +283,7 @@ router.put(
               businessEmail: newShop.businessEmail,
               facebook: newShop.facebook,
               website: newShop.website,
+              updatedDate: date,
             },
           },
           { new: true }
@@ -302,7 +294,12 @@ router.put(
         var shop = await Shop.findOneAndUpdate(
           //{ owner: user.id },
           { businessName: req.shop.businessName },
-          { $set: { shopDescription: newShop.shopDescription } },
+          {
+            $set: {
+              shopDescription: newShop.shopDescription,
+              updatedDate: date,
+            },
+          },
           { new: true }
         )
           .populate("category")
@@ -311,121 +308,13 @@ router.put(
       if (!shop) {
         return res.status(404).send({ message: "Internal Error" });
       }
-      await Shop.findOneAndUpdate(
-        { owner: user.id },
-        { updatedDate: Date.now() }
-      );
+      // await Shop.findOneAndUpdate(
+      //   { owner: user.id },
+      //   { updatedDate: Date.now() }
+      // );
       res.status(200).send(shop);
     } catch (error) {
       res.status(400).send({ message: error.message });
-    }
-  }
-);
-router.put(
-  "/myshop/banner",
-  authorization,
-  upload.fields([
-    { name: "profilePicture", maxCount: 2 },
-    { name: "profileVideo", maxCount: 2 },
-  ]),
-  async (req, res) => {
-    var user = await User.findOne({ email: req.user.email }).select("+_id");
-    var { body: newShop } = req;
-    var date = Date.now();
-    try {
-      if (req.profilePicture != undefined && req.profileVideo != undefined) {
-        var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
-          {
-            $set: {
-              "banner.colorIndex": newShop.colorIndex,
-              "banner.showDiscount": newShop.showDiscount,
-              "banner.selectProfile": newShop.selectProfile,
-              discountPercent: newShop.discountPercent,
-              profilePicture: req.profilePicture,
-              profileVideo: req.profileVideo,
-              updatedDate: date,
-            },
-          },
-          { new: true }
-        )
-          .populate("category")
-          .populate("owner", "email");
-      } else if (
-        req.profilePicture == undefined &&
-        req.profileVideo != undefined
-      ) {
-        var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
-          {
-            $set: {
-              "banner.colorIndex": newShop.colorIndex,
-              "banner.showDiscount": newShop.showDiscount,
-              "banner.selectProfile": newShop.selectProfile,
-              discountPercent: newShop.discountPercent,
-              // profilePicture:req.profilePicture,
-              profileVideo: req.profileVideo,
-              updatedDate: date,
-            },
-          },
-          { new: true }
-        )
-          .populate("category")
-          .populate("owner", "email");
-      } else if (
-        req.profilePicture != undefined &&
-        req.profileVideo == undefined
-      ) {
-        var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
-          {
-            $set: {
-              "banner.colorIndex": newShop.colorIndex,
-              "banner.showDiscount": newShop.showDiscount,
-              "banner.selectProfile": newShop.selectProfile,
-              discountPercent: newShop.discountPercent,
-              profilePicture: req.profilePicture,
-              updatedDate: date,
-              //profileVideo: req.profileVideo,
-            },
-          },
-          { new: true }
-        )
-          .populate("category")
-          .populate("owner", "email");
-      } else if (
-        req.profilePicture == undefined &&
-        req.profileVideo == undefined
-      ) {
-        var shop = await Shop.findOneAndUpdate(
-          { owner: user.id },
-          {
-            $set: {
-              "banner.colorIndex": newShop.colorIndex,
-              "banner.showDiscount": newShop.showDiscount,
-              "banner.selectProfile": newShop.selectProfile,
-              discountPercent: newShop.discountPercent,
-              // updatedDate: date,
-              // profilePicture:req.profilePicture,
-              // profileVideo:req.profileVideo,
-            },
-          },
-          { new: true }
-        )
-          .populate("category")
-          .populate("owner", "email");
-      }
-
-      if (!shop) {
-        return res.status(404).send({ message: "Internal Error" });
-      }
-      await Shop.findOneAndUpdate(
-        { owner: user.id },
-        { updatedDate: Date.now() }
-      );
-      res.status(200).send(shop);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
     }
   }
 );
