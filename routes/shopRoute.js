@@ -252,7 +252,7 @@ router.put(
   upload.single("logo"),
   async (req, res) => {
     try {
-      //var user = await User.findOne({ email: req.user.email }).select("+_id");
+      var user = await User.findOne({ email: req.user.email }).select("+_id");
       var { body: newShop } = req;
       if (newShop.businessName !== null && req.logo !== undefined) {
         fs.unlinkSync(appDir + "/pubic/shops/" + req.shop.businessLogo);
