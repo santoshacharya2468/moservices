@@ -27,8 +27,10 @@ const storage = multer.diskStorage({
     let filename = Date.now() + "_" + file.originalname;
     if (file.fieldname === "logo") {
       req.logo = "/public/shops/" + filename;
+      //req.logo = filename;
     } else if (file.fieldname === "profilePicture") {
       req.profilePicture = "/public/shops/profilepicture/" + filename;
+      //req.profilePicture = filename;
     } else if (file.fieldname === "profileVideo") {
       req.profileVideo = "/public/shops/profilevideo/" + filename;
     }
@@ -239,7 +241,7 @@ router.put(
   upload.single("logo"),
   async (req, res) => {
     try {
-      //var user = await User.findOne({ email: req.user.email }).select("+_id");
+      var user = await User.findOne({ email: req.user.email }).select("+_id");
       var { body: newShop } = req;
       let date = Date.now();
       if (newShop.businessName !== null && req.logo !== undefined) {
