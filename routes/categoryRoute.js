@@ -5,9 +5,9 @@ const Visit=require("../models/view");
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.find();
+    res.json(categories);
     var visit=new Visit();
     await visit.save();
-    res.json(categories);
   } catch (e) {
     res.status(500).send({ message: "Error retrieving categories" });
   }
