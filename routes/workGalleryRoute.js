@@ -107,7 +107,7 @@ router.post("/", authorization, hasShop, upload.single("image"), async (req, res
     catch (e) {
         fs.unlinkSync(appDir + req.upload);
         res.status(400).send(e);
-        res.status(400).send(e);
+        
     }
 });
 module.exports = router;
