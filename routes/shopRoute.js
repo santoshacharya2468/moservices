@@ -26,11 +26,11 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     let filename = Date.now() + "_" + file.originalname;
     if (file.fieldname === "logo") {
-      // req.logo = "/public/shops/" + filename;
-      req.logo = filename;
+       req.logo = "/public/shops/" + filename;
+      //req.logo = filename;
     } else if (file.fieldname === "profilePicture") {
-      // req.profilePicture = "/public/shops/profilepicture/" + filename;
-      req.profilePicture = filename;
+      req.profilePicture = "/public/shops/profilepicture/" + filename;
+      //req.profilePicture = filename;
     } else if (file.fieldname === "profileVideo") {
       // req.profileVideo = "/public/shops/profilevideo/" + filename;
       req.profileVideo = filename;
