@@ -36,7 +36,7 @@ router.delete("/:galleryId", authorization, hasShop, async (req, res) => {
         await WorkGallery.findOneAndRemove({ _id: req.params.galleryId, shop: req.shop });
         try {
             fs.unlinkSync(appDir + gallery.imageUrl);
-            fs.unlink(appDir+gallery.thumbnail);
+            fs.unlinkSync(appDir+gallery.thumbnail);
         }
         catch (e) { }
         res.status(204).json(gallery);
@@ -63,7 +63,7 @@ router.delete("/admin/:galleryId", authorization, hasShop, async (req, res) => {
         await WorkGallery.findOneAndRemove({ _id: req.params.galleryId });
         try {
             fs.unlinkSync(appDir + gallery.imageUrl);
-            fs.unlink(appDir+gallery.thumbnail);
+            fs.unlinkSync(appDir+gallery.thumbnail);
         }
         catch (e) { }
         res.status(204).json(gallery);
