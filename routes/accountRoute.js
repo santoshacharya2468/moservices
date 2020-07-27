@@ -51,7 +51,7 @@ router.post("/reset/:email", async (req, res) => {
         from: process.env.email,
         to: user.email,
         subject: "Password reset link",
-        html: `<div>Password reset to MoServices was requested.</div><div><a href="${resetLink}">Click Here to reset your password</a></div>`,
+        html: `<div>Password reset to NouServices was requested.</div><div><a href="${resetLink}">Click Here to reset your password</a></div>`,
       };
       await transport.sendMail(mailOptions);
       await User.findOneAndUpdate({ email: user.email }, { token: token });
