@@ -50,6 +50,26 @@ router.get("/", async (req, res) => {
     res.status(500).send({ message: "server error" + e });
   }
 });
+router.get("/by_date", async (req, res) => {
+  let page = req.query.page || 1;
+  try {
+    var shops = await Shop.find({ activated: true })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("category")
+      .populate("owner", "email")
+      .sort({ updatedDate: -1 });
+
+    if ((await Shop.find({ activated: true }).count()) > perPage * page) {
+      var nextPage = Number(page) + 1;
+    } else {
+      nextPage = null;
+    }
+    res.json({ data: shops, perPage: perPage, next: nextPage });
+  } catch (e) {
+    res.status(500).send({ message: "server error" + e });
+  }
+});
 router.get("/:catId", async (req, res) => {
   let page = req.query.page || 1;
   try {
