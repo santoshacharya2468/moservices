@@ -115,7 +115,8 @@ app.get("/search/:query", async (req, res) => {
   //this route should be paginated
   try {
     var shops = await Shop.find({
-      businessName: { $regex: req.params.query, $options: "i" },
+       $or: [  businessName: { $regex: req.params.query, $options: "i"},  shopDescription: { $regex: req.params.query, $options: "i"}] 
+      },
       activated: true,
     })
       .populate("category")
@@ -130,7 +131,7 @@ app.get("/admin-search/:query", async (req, res) => {
   //this route should be paginated
   try {
     var shops = await Shop.find({
-      businessName: { $regex: req.params.query, $options: "i" },
+      $or: [  businessName: { $regex: req.params.query, $options: "i"},  shopDescription: { $regex: req.params.query, $options: "i"}]
     })
       .populate("category")
       .populate("owner", "email")
