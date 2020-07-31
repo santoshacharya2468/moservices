@@ -107,7 +107,7 @@ app.set("view engine", "ejs");
 app.get("/clicks-views/:providerId",isAdmin,async(req,res)=>{
   var likes=await like.find({shop:req.params.providerId});
   var clicks=await click.find({shop:req.params.providerId});
-  res.json({views:clicks.count(),likes:likes.count()});
+  res.json({views:clicks.length,likes:likes.length});
   
 });
 //search route
