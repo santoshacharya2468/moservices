@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 var morgan = require("morgan");
 const path = require("path");
 const Shop = require("./models/shop");
+const click=require("./models/click");
+const like=require("./models/like");
 const bcrypt = require("bcryptjs");
 //middleware
 const appMiddleware = require("./middlewares/appmiddleware");
@@ -102,7 +104,12 @@ app.use("/admin", isAdmin, admin);
 app.get("/csvfile", isAdmin, async (req, res) => {});
 
 app.set("view engine", "ejs");
-
+app.get("/clicks-views:providerId",isAdmin,async(req,res)=>{
+  var likes=await like.find({shop:req.params.providerId});
+  var clicks=await click.find({shop:req.params.providerId});
+  res.json({views:clicks.count(),likes:likes.count()});
+  
+});
 //search route
 app.get("/search/:query", async (req, res) => {
   //this route should be paginated
