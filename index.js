@@ -115,7 +115,7 @@ app.get("/search/:query", async (req, res) => {
   //this route should be paginated
   try {
     var shops = await Shop.find({
-     $or:[{$search:req.params.query}], 
+     $or:[$text:{$search:req.params.query}], 
      activated:true
     })
       .populate("category")
