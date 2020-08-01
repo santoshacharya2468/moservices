@@ -121,7 +121,7 @@ app.get("/search/:query", async (req, res) => {
 //       .populate("category")
 //       .populate("owner", "email")
 //       .limit(20);
-   var shops= mongoose.collection.db.shops.find().exec();
+   var shops= mongoose.collection.shops.find().exec();
     res.json(shops);
   } catch (e) {
     res.status(500).send({ message: "server error" + e.message });
