@@ -121,9 +121,11 @@ app.get("/search/:query", async (req, res) => {
 //       .populate("category")
 //       .populate("owner", "email")
 //       .limit(20);
-   var shops=await mongoose.connection.db.collection('shops').find();
-    console.log(shops);
-    res.json(shops);
+   mongoose.connection.db.collection('shops').find().toArray((er,rs)=>{
+   res.send(rs);
+   });
+//     console.log(shops);
+//     res.json(shops);
   } catch (e) {
     res.status(500).send({ message: "server error" + e.message });
   }
