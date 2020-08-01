@@ -116,7 +116,7 @@ app.get("/search/:query", async (req, res) => {
   try {
     var shops = await Shop.find({
      $text:{$search:"google"}, 
-      activated: true,
+     
     })
       .populate("category")
       .populate("owner", "email")
