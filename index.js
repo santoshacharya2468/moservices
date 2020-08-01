@@ -121,7 +121,7 @@ app.get("/search/:query", async (req, res) => {
 //       .populate("category")
 //       .populate("owner", "email")
 //       .limit(20);
-   mongoose.connection.db.collection('shops').find().toArray((er,rs)=>{
+   mongoose.connection.db.collection('shops').find({$text:{$search:req.params.query}}).toArray((er,rs)=>{
    res.send(rs);
    });
 //     console.log(shops);
