@@ -114,13 +114,14 @@ app.get("/clicks-views/:providerId",isAdmin,async(req,res)=>{
 app.get("/search/:query", async (req, res) => {
   //this route should be paginated
   try {
-    var shops = await Shop.find({
-     $text:{$search:req.params.query}, 
-     activated:true
-    })
-      .populate("category")
-      .populate("owner", "email")
-      .limit(20);
+//     var shops = await Shop.find({
+//      $text:{$search:req.params.query}, 
+//      activated:true
+//     })
+//       .populate("category")
+//       .populate("owner", "email")
+//       .limit(20);
+   var shops= mongoose.collection.db.shops.find().exec();
     res.json(shops);
   } catch (e) {
     res.status(500).send({ message: "server error" + e.message });
