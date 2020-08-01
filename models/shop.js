@@ -80,6 +80,6 @@ const shopSchema = mongoose.Schema({
   updatedDate: {type: Date,default: Date.now,},
 
 });
-shopSchema.index({businessName: 'text', shopDescription: 'text',website:'text',mobiles:'text'});
+shopSchema.index({businessName: 'text', shopDescription: 'text',website:'text',mobiles:'text',telephones:"text"});
 
 module.exports = mongoose.model("Shop", shopSchema);
