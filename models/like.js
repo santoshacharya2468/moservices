@@ -7,7 +7,7 @@ const LikeSchema=mongoose.Schema({
     },
     likeDate:{
         type:Date,
-        default:Date.now(),
+        default:Date.now,
     }
 });
 module.exports=mongoose.model("Like",LikeSchema);
