@@ -25,6 +25,10 @@ app.listen(process.env.PORT || 8080, () =>
   console.log(`Server running on port ${process.env.PORT}`)
 );
 app.use(bodyParser.urlencoded({ extended: true }));
+app.get("/",(req,res)=>{
+  res.sendfile(__dirname+"/public/index.html");
+
+});
 app.get("/password-reset/:token",async(req,res)=>{
   res.sendfile(__dirname+"/reset.html");
 });
