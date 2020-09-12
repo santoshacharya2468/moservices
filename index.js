@@ -109,7 +109,7 @@ app.get("/public-banner",async(req,res)=>{
   .populate("category")
   .populate("owner", "email")
   .sort({ registeredAt: -1 });
-  res.json(shops);
+  res.json({data:shops});
 });
 //admin route
 const videoRoute=require("./routes/userVideoRoute");
