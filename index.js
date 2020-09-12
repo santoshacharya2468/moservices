@@ -11,8 +11,10 @@ const appMiddleware = require("./middlewares/appmiddleware");
 //models
 const User = require("./models/user");
 const dotenv = require("dotenv");
+const cors=require("cors");
 dotenv.config();
 const app = express();
+app.use(cors());
 app.use("/public", express.static(path.join(__dirname, "public")));
 const bodyParser=require("body-parser");
 mongoose.connect(process.env.dbCon, {
@@ -101,7 +103,9 @@ app.use("/click", appMiddleware, clickRoute);
 app.use("/like", appMiddleware, likeRoute);
 app.use("/banner", bannerRoute);
 //admin route
+const videoRoute=require("./routes/userVideoRoute");
 app.use("/admin-shop", isAdmin, adminShopRoute);
+app.use("/interview-video",videoRoute);
 app.use("/admin-category", isAdmin, adminCategoryRoute);
 app.use("/admin", isAdmin, admin);
 
