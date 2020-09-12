@@ -15,6 +15,8 @@ const cors=require("cors");
 dotenv.config();
 const app = express();
 app.use(cors());
+
+app.use("/", express.static(path.join(__dirname, "public")));
 app.use("/public", express.static(path.join(__dirname, "public")));
 const bodyParser=require("body-parser");
 mongoose.connect(process.env.dbCon, {
@@ -26,7 +28,7 @@ app.use(morgan("tiny"));
 app.listen(process.env.PORT || 8080, () =>
   console.log(`Server running on port ${process.env.PORT}`)
 );
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true,limit:"300M" }));
 app.get("/",(req,res)=>{
   res.sendfile(__dirname+"/public/index.html");
 
@@ -79,7 +81,7 @@ app.get("/verify_account/:token", async (req, res) => {
     res.status(500).send("Error verifying your account" );
   }
 });
-app.use(express.json());
+app.use(express.json({limit:"300M"}));
 //routes
 const accountRoute = require("./routes/accountRoute");
 const shopRoute = require("./routes/shopRoute");
@@ -102,6 +104,13 @@ app.use("/gallery", appMiddleware, galleryRoute);
 app.use("/click", appMiddleware, clickRoute);
 app.use("/like", appMiddleware, likeRoute);
 app.use("/banner", bannerRoute);
+app.get("/public-banner",async(req,res)=>{
+  var shops = await Shop.find({ activated: true })
+  .populate("category")
+  .populate("owner", "email")
+  .sort({ registeredAt: -1 });
+  res.json(shops);
+});
 //admin route
 const videoRoute=require("./routes/userVideoRoute");
 app.use("/admin-shop", isAdmin, adminShopRoute);
