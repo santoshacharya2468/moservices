@@ -25,7 +25,7 @@ mongoose.connect(process.env.dbCon, {
   useCreateIndex: true,
 });
 app.use(morgan("tiny"));
-app.listen(process.env.PORT || 8080, () =>
+app.listen(process.env.PORT || 8080,() =>
   console.log(`Server running on port ${process.env.PORT}`)
 );
 app.use(bodyParser.urlencoded({ extended: true,limit:"300M" }));

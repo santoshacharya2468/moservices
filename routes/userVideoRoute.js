@@ -9,12 +9,26 @@ const hasShop = require("../middlewares/hasShop");
 const perPage = 20;
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, appDir + "/public/interview");
+    if(file.fieldname=="interviewvideo"){
+      cb(null, appDir + "/public/interview");
+    }
+    else{
+      cb(null, appDir + "/public/interview/thumbnails");
+    }
+    
   },
   filename: (req, file, cb) => {
-    let filename = Date.now() + "_" + file.originalname;
-    req.upload = "/public/interview/" + filename;
+    if(file.fieldname=="interviewvideo"){
+      let filename = Date.now() + "_" + file.originalname;
+    req.video = "/public/interview/" + filename;
     cb(null, filename);
+    }
+    else{
+      let filename = Date.now() + "_" + file.originalname;
+    req.thumbnail = "/public/interview/thumbnails/" + filename;
+    cb(null, filename);
+    }
+    
   },
 });
 const upload = multer({ storage: storage });
@@ -42,10 +56,10 @@ router.post(
   "/",
   authorization,
   isAdmin,
-  upload.single("interviewvideo"),
+  upload.fields([{name:"interviewvideo",maxCount:1},{name:'thumbnail',maxCount:1}]),
   async (req, res) => {
     req.body.videoLink = req.upload;
-    let video = new Video(req.body);
+    let video = new Video({thumbnail:req.thumbnail,videoLink:req.video,title:req.body.title});
     try {
       var result = await video.save();
       res.status(201).send(result);
