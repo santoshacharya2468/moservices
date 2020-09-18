@@ -6,6 +6,7 @@ const multer = require("multer");
 const authorization = require("../middlewares/authorization");
 const isAdmin=require("../middlewares/isAdmin");
 const hasShop = require("../middlewares/hasShop");
+const fs=require("fs");
 const perPage = 20;
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -68,4 +69,24 @@ router.post(
     }
   }
 );
+var appDir = path.dirname(require.main.filename);
+router.delete("/:videoId",async(req,res)=>{
+  let id=req.params.videoId;
+    var video=await Video.findById(id);
+    var vdideo=await  Video.findByIdAndDelete(id);
+    try{
+      fs.unlinkSync(appDir+video.videoLink);
+    }
+    catch(e){}
+    
+    try{
+    
+      fs.unlinkSync(appDir+video.thumbnail);
+    }
+    catch(e){}
+ 
+    res.status(204).send();
+  
+
+});
 module.exports = router;
