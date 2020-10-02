@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 var path = require("path");
 var appDir = path.dirname(require.main.filename);
+const Shop=require("../models/shop");
 const multer = require("multer");
 const authorization = require("../middlewares/authorization");
 const isAdmin=require("../middlewares/isAdmin");
@@ -34,14 +35,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 const Video = require("../models/videoInteview");
+const { Mongoose } = require("mongoose");
 router.get("/", async (req, res) => {
   var page = req.query.page || 1;
 
   try {
     var videos = await Video.find()
+      
       .limit(perPage)
       .skip((page - 1) * perPage)
-      .sort({ _id: -1 });
+      .sort({ _id: -1 })
+      .populate({path:"shop",populate:{path:"category"}});
+      
     if ((await Video.count()) > perPage * page) {
       var nextPage = Number(page) + 1;
     } else {
@@ -60,7 +65,10 @@ router.post(
   upload.fields([{name:"interviewvideo",maxCount:1},{name:'thumbnail',maxCount:1}]),
   async (req, res) => {
     req.body.videoLink = req.upload;
-    let video = new Video({thumbnail:req.thumbnail,videoLink:req.video,name:req.body.name,shop:req.body.shopId});
+    let shop=await Shop.findById(req.body.shop);
+    
+    let video = new Video({thumbnail:req.thumbnail,videoLink:req.video,name:req.body.name,
+      shop:shop});
     try {
       var result = await video.save();
       res.status(201).send(result);
@@ -70,7 +78,7 @@ router.post(
   }
 );
 var appDir = path.dirname(require.main.filename);
-router.delete("/:videoId",async(req,res)=>{
+router.delete("/:videoId",authorization,isAdmin,async(req,res)=>{
   let id=req.params.videoId;
     var video=await Video.findById(id);
     var vdideo=await  Video.findByIdAndDelete(id);
