@@ -60,7 +60,7 @@ router.post(
   upload.fields([{name:"interviewvideo",maxCount:1},{name:'thumbnail',maxCount:1}]),
   async (req, res) => {
     req.body.videoLink = req.upload;
-    let video = new Video({thumbnail:req.thumbnail,videoLink:req.video,title:req.body.title});
+    let video = new Video({thumbnail:req.thumbnail,videoLink:req.video,name:req.body.name,shop:req.body.shopId});
     try {
       var result = await video.save();
       res.status(201).send(result);
@@ -86,7 +86,24 @@ router.delete("/:videoId",async(req,res)=>{
     catch(e){}
  
     res.status(204).send();
-  
 
+});
+router.patch("/like/:videoId",async(req,res)=>{
+  let id=req.params.videoId;
+    var video=await Video.findById(id);
+    await  Video.findByIdAndUpdate(id,{likes:video.likes+1});
+    res.send(await Video.findById(id));
+});
+router.patch("/share/:videoId",async(req,res)=>{
+  let id=req.params.videoId;
+    var video=await Video.findById(id);
+    await  Video.findByIdAndUpdate(id,{shares:video.shares+1});
+    res.send(await Video.findById(id));
+});
+router.patch("/view/:videoId",async(req,res)=>{
+    let id=req.params.videoId;
+    var video=await Video.findById(id);
+    await  Video.findByIdAndUpdate(id,{views:video.views+1});
+    res.send(await Video.findById(id));
 });
 module.exports = router;

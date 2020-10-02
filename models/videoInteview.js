@@ -1,6 +1,6 @@
 const mongoose=require("mongoose");
 const visitSchema=mongoose.Schema({
-    title:{
+    name:{
         type:String,
     },
     videoLink:{
@@ -10,6 +10,23 @@ const visitSchema=mongoose.Schema({
     thumbnail:{
         type:String,
         required:true
+    },
+    shop:{
+        type:mongoose.Types.ObjectId,
+        ref:"Shop",
+        required:true,
+    },
+    likes:{
+        type:Number,
+        default:0,
+    },
+    views:{
+        type:Number,
+        default:0,
+    },
+    shares:{
+        type:Number,
+        default:0,
     },
     date:{
         type:Date,
