@@ -21,7 +21,8 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     if(file.fieldname=="interviewvideo"){
-      let filename = Date.now() + "_" + file.originalname;
+      var extname=path.extname(file.originalname);
+      let filename = Date.now() + "_" + extname;
     req.video = "/public/interview/" + filename;
     cb(null, filename);
     }
